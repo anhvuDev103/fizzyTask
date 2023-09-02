@@ -1,5 +1,6 @@
 declare namespace Express {
   interface Request {
-    decodedRefreshToken?: string;
+    decodedRefreshToken?: string | JwtPayload;
+    decodedAccessToken?: string | JwtPayload;
   }
 }

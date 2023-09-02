@@ -1,5 +1,6 @@
 import { Collection, Db, MongoClient, ServerApiVersion } from 'mongodb';
 import RefreshToken from '~/models/database/schemas/refreshToken.schema';
+import Task from '~/models/database/schemas/task.schema';
 
 import User from '~/models/database/schemas/user.schemas';
 
@@ -31,6 +32,10 @@ class DatabaseService {
 
   get refreshTokens(): Collection<RefreshToken> {
     return this.dbInstance.collection(process.env.REFRESH_TOKENS_COLLECTION_NAME!);
+  }
+
+  get tasks(): Collection<Task> {
+    return this.dbInstance.collection(process.env.TASKS_COLLECTION_NAME!);
   }
 }
 

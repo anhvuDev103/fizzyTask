@@ -1,6 +1,6 @@
 import { SignOptions } from 'jsonwebtoken';
 import { TokenType } from '~/constants/enums';
-import { RequiredPick } from '~/utils/types';
+import { WithRequired } from '~/utils/types';
 
 interface Payload {
   user_id: string;
@@ -10,18 +10,18 @@ interface Payload {
 interface TokenContructorParams {
   payload: Payload;
   secretOrPrivateKey: string;
-  option: RequiredPick<SignOptions, 'expiresIn'>;
+  options: WithRequired<SignOptions, 'expiresIn'>;
 }
 
 class Token {
   payload: Payload;
   secretOrPrivateKey: string;
-  option: SignOptions;
+  options: SignOptions;
 
   constructor(_payload: TokenContructorParams) {
     this.payload = _payload.payload;
     this.secretOrPrivateKey = _payload.secretOrPrivateKey;
-    this.option = _payload.option;
+    this.options = _payload.options;
   }
 }
 

@@ -13,6 +13,7 @@ import { ObjectId } from 'mongodb';
 
 class UserService {
   private signAccessToken(userId: string) {
+    console.log('>> Check | process.env.JWT_EXPIRES_IN_ACCESS_TOKEN:', process.env.JWT_EXPIRES_IN_ACCESS_TOKEN);
     return signToken(
       new Token({
         payload: {
@@ -20,7 +21,7 @@ class UserService {
           user_id: userId,
         },
         secretOrPrivateKey: process.env.JWT_SECRET_ACCESS_TOKEN!,
-        option: {
+        options: {
           expiresIn: process.env.JWT_EXPIRES_IN_ACCESS_TOKEN!,
         },
       }),
@@ -35,7 +36,7 @@ class UserService {
           user_id: userId,
         },
         secretOrPrivateKey: process.env.JWT_SECRET_REFRESH_TOKEN!,
-        option: {
+        options: {
           expiresIn: process.env.JWT_EXPIRES_IN_REFRESH_TOKEN!,
         },
       }),
