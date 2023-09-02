@@ -1,10 +1,13 @@
 import { checkSchema } from 'express-validator';
 import { ParamSchema } from 'express-validator/src/middlewares/schema';
+import { HTTP_STATUS } from '~/constants/http';
 import APP_MESSAGES from '~/constants/messages';
 import { EMAIL_REGEX } from '~/constants/regexs';
 import { ErrorWithStatus } from '~/models/errors';
 import { RegisterRequestBody } from '~/models/requests/users.requests';
+import databaseServices from '~/services/database.services';
 import usersServices from '~/services/users.services';
+import { verifyToken } from '~/utils/jwt';
 
 import { isEmail, validate } from '~/utils/validate';
 
@@ -68,6 +71,76 @@ export const registerValidator = validate(
             }
 
             return true;
+          },
+        },
+      },
+    },
+    ['body'],
+  ),
+);
+
+export const loginValidator = validate(
+  checkSchema(
+    {
+      email: {
+        ...getStringSchema('email', { isLength: false }),
+        isEmail: {
+          errorMessage: 'email is invalid',
+        },
+      },
+      password: getStringSchema('password', { isPassword: true }),
+    },
+    ['body'],
+  ),
+);
+
+export const accessTokenValidator = validate(
+  checkSchema(
+    {
+      Authorization: {
+        custom: {
+          options: (value: string, { req }) => {
+            console.log('>> Check | value:', value);
+            return true;
+          },
+        },
+      },
+    },
+    ['headers'],
+  ),
+);
+
+export const refreshTokenValidator = validate(
+  checkSchema(
+    {
+      refresh_token: {
+        custom: {
+          options: async (value: string, { req }) => {
+            if (!value) {
+              throw new ErrorWithStatus({
+                message: APP_MESSAGES.REFRESH_TOKEN_IS_REQUIRED,
+                status: HTTP_STATUS.UNAUTHORIZED,
+              });
+            }
+
+            const [decodedRefreshToken, refreshToken] = await Promise.all([
+              verifyToken({
+                token: value,
+                secretOrPublicKey: process.env.JWT_SECRET_REFRESH_TOKEN!,
+              }),
+              databaseServices.refreshTokens.findOne({
+                token: value,
+              }),
+            ]);
+
+            if (!refreshToken) {
+              throw new ErrorWithStatus({
+                message: APP_MESSAGES.REFRESH_TOKEN_NOT_EXISTED,
+                status: HTTP_STATUS.UNAUTHORIZED,
+              });
+            }
+
+            req.decodedRefreshToken = decodedRefreshToken;
           },
         },
       },

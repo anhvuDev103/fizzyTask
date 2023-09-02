@@ -5,7 +5,6 @@ import { HTTP_STATUS } from '~/constants/http';
 import { ErrorWithStatus } from '~/models/errors';
 
 const defaultErrorHandler = (error: any, req: Request, res: Response, next: NextFunction) => {
-  // return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(error);
   try {
     if (error instanceof ErrorWithStatus) {
       return res.status(error.status).json(omit(error, 'status'));

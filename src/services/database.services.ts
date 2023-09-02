@@ -1,6 +1,9 @@
 import { Collection, Db, MongoClient, ServerApiVersion } from 'mongodb';
+import RefreshToken from '~/models/database/schemas/refreshToken.schema';
 
-import User from '~/models/database/schemas/users.schemas';
+import User from '~/models/database/schemas/user.schemas';
+
+const URI = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@fizzytask.wk9bt5p.mongodb.net/?retryWrites=true&w=majority`;
 
 class DatabaseService {
   private client: MongoClient;
@@ -8,7 +11,7 @@ class DatabaseService {
 
   constructor() {
     // Create a MongoClient with a MongoClientOptions object to set the Stable API version
-    this.client = new MongoClient(process.env.URI!);
+    this.client = new MongoClient(URI);
     this.dbInstance = this.client.db(process.env.DB_NAME);
   }
 
@@ -24,6 +27,10 @@ class DatabaseService {
 
   get users(): Collection<User> {
     return this.dbInstance.collection(process.env.USERS_COLLECTION_NAME!);
+  }
+
+  get refreshTokens(): Collection<RefreshToken> {
+    return this.dbInstance.collection(process.env.REFRESH_TOKENS_COLLECTION_NAME!);
   }
 }
 

@@ -6,10 +6,9 @@ import defaultErrorHandler from './middlewares/error.middlewares';
 
 const app = express();
 app.use(express.json());
+databaseService.connect();
 
 app.use('/users', userRouter);
-
-databaseService.connect();
 
 app.use(defaultErrorHandler);
 
