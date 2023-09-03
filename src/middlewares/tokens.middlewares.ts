@@ -7,6 +7,7 @@ import APP_MESSAGES from '~/constants/messages';
 import { ErrorWithStatus } from '~/models/errors';
 import databaseServices from '~/services/database.services';
 import { verifyToken } from '~/utils/jwt';
+import { TokenPayload } from '~/utils/types';
 import { validate } from '~/utils/validate';
 
 export const accessTokenValidator = validate(
@@ -28,7 +29,7 @@ export const accessTokenValidator = validate(
                 secretOrPublicKey: process.env.JWT_SECRET_ACCESS_TOKEN!,
               });
 
-              (req as Request).decodedAccessToken = decodedAccessToken;
+              req.decoded_authorization = decodedAccessToken;
               return true;
             } catch (error) {
               throw new ErrorWithStatus({
@@ -74,7 +75,7 @@ export const refreshTokenValidator = validate(
               });
             }
 
-            (req as Request).decodedRefreshToken = decodedRefreshToken;
+            req.decodedRefreshToken = decodedRefreshToken;
             return true;
           },
         },

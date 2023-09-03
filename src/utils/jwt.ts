@@ -1,4 +1,5 @@
 import jwt, { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
+import { TokenPayload } from './types';
 
 interface SignTokenParams {
   payload: string | object | Buffer;
@@ -23,14 +24,14 @@ export const signToken = ({ payload, secretOrPrivateKey, options = { algorithm: 
   });
 };
 
-export const verifyToken = ({ token, secretOrPublicKey }: VerifyTokenParams) => {
-  return new Promise<string | JwtPayload>((resolve, reject) => {
+export const verifyToken = ({ token, secretOrPublicKey }: VerifyTokenParams): Promise<TokenPayload> => {
+  return new Promise<TokenPayload>((resolve, reject) => {
     jwt.verify(token, secretOrPublicKey, (error, decoded) => {
       if (error) {
         throw reject(error);
       }
 
-      resolve(decoded!);
+      resolve(decoded as TokenPayload);
     });
   });
 };

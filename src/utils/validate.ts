@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { body, validationResult, ValidationChain } from 'express-validator';
 import { ParamSchema, RunnableValidationChains } from 'express-validator/src/middlewares/schema';
+import { ObjectId } from 'mongodb';
 
 import { HTTP_STATUS } from '~/constants/http';
+import APP_MESSAGES from '~/constants/messages';
 import { EntityError, ErrorWithStatus } from '~/models/errors';
 
 // sequential processing, stops running validations chain if the previous one fails.
@@ -40,7 +42,7 @@ interface StringSchemaOptions {
   isPassword?: boolean;
 }
 
-export function getStringSchema(field: string, options?: StringSchemaOptions): ParamSchema {
+export const getStringSchema = (field: string, options?: StringSchemaOptions): ParamSchema => {
   const { notEmpty = true, isString = true, isLength = [5, 25], trim = true, isPassword = false } = options || {};
   return {
     notEmpty: notEmpty && {
@@ -62,4 +64,18 @@ export function getStringSchema(field: string, options?: StringSchemaOptions): P
     },
     trim: trim,
   };
-}
+};
+
+export const getISOStringDateSchema = (): ParamSchema => {
+  return {
+    isISO8601: {
+      options: {
+        strict: true,
+        strictSeparator: true,
+      },
+      errorMessage: APP_MESSAGES.DATE_OF_BIRTH_MUST_BE_ISO8601,
+    },
+  };
+};
+
+export const isValidObjectId = (value: string): boolean => ObjectId.isValid(value);

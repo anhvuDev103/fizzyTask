@@ -1,8 +1,10 @@
 import { Router } from 'express';
 
-import { createTaskController, getTasksByUserIdController } from '~/controllers/tasks.controllers';
-import { createTaskValidator } from '~/middlewares/tasks.middlewares';
+import { createTaskController, getAllTasksController, updateTaskController } from '~/controllers/tasks.controllers';
+import { filterMiddleware } from '~/middlewares/common.middlewares';
+import { taskRequestValidator, taskIdValidator } from '~/middlewares/tasks.middlewares';
 import { accessTokenValidator } from '~/middlewares/tokens.middlewares';
+import { UpdateTaskRequestBody } from '~/models/requests/tasks.requests';
 
 const taskRouter = Router();
 
@@ -13,7 +15,7 @@ const taskRouter = Router();
  * BODY: { email: string, password: string }
  * HEADERS: { Authorization: Bearer <access_token> }
  */
-taskRouter.get('/:userId', accessTokenValidator, getTasksByUserIdController);
+taskRouter.get('/', accessTokenValidator, getAllTasksController);
 
 /**
  * DESCRIPTION: Create a task
@@ -22,6 +24,22 @@ taskRouter.get('/:userId', accessTokenValidator, getTasksByUserIdController);
  * BODY: { email: string, password: string }
  * HEADERS: { Authorization: Bearer <access_token> }
  */
-taskRouter.post('/', accessTokenValidator, createTaskValidator, createTaskController);
+taskRouter.post('/', accessTokenValidator, taskRequestValidator, createTaskController);
+
+/**
+ * DESCRIPTION: Update a task
+ * PATH: /:task_id
+ * METHOD: PATCH
+ * BODY: TaskSchema
+ * HEADERS: { Authorization: Bearer <access_token> }
+ */
+taskRouter.patch(
+  '/:task_id',
+  accessTokenValidator,
+  taskIdValidator,
+  taskRequestValidator,
+  filterMiddleware<UpdateTaskRequestBody>(['title', 'description', 'due_date', 'project_id', 'tag_ids']),
+  updateTaskController,
+);
 
 export default taskRouter;
